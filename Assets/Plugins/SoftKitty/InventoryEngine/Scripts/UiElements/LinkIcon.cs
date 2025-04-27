@@ -140,11 +140,11 @@ namespace SoftKitty.InventoryEngine
                             InventoryItem _itemSource = ItemDragManager.DraggingSource.GetComponent<InventoryItem>();
                             if (LimitedByTag.Length > 0 && !_source.isTagMatchText(LimitedByTag))
                             {
-                                DynamicMsg.PopMsg("Sorry you can not assign this item here.");
+                                DynamicMsg.PopMsg(ItemManager.instance.msgItemAssign);
                             }
                             else if (LimitedByOwner != null && _itemSource!=null && _itemSource.Holder != LimitedByOwner)
                             {
-                                DynamicMsg.PopMsg("Sorry you can not assign this item here.");
+                                DynamicMsg.PopMsg(ItemManager.instance.msgItemAssign);
                             }
                             else if (ItemDragManager.DraggingSource.Type == IconType.Link)
                             {
@@ -195,7 +195,7 @@ namespace SoftKitty.InventoryEngine
                 }
                 if (InputProxy.GetMouseButton(0))
                 {
-                    mouseDownTime += Time.deltaTime;
+                    mouseDownTime += Time.unscaledDeltaTime;
                 }
                 else
                 {

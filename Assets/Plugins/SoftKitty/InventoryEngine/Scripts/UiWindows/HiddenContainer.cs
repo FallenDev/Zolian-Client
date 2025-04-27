@@ -66,13 +66,13 @@ namespace SoftKitty.InventoryEngine
             if (NumberInput.instance != null)
             {
                 BlockImage.gameObject.SetActive(true);
-                BlockImage.color = new Color(0F, 0F, 0F, Mathf.Lerp(BlockImage.color.a, 0.94F, Time.deltaTime * 3F));
+                BlockImage.color = new Color(0F, 0F, 0F, Mathf.Lerp(BlockImage.color.a, 0.94F, Time.unscaledDeltaTime * 3F));
             }
             else
             {
                 if (BlockImage.color.a > 0F)
                 {
-                    BlockImage.color = new Color(0F, 0F, 0F, Mathf.MoveTowards(BlockImage.color.a, 0F, Time.deltaTime * 2F));
+                    BlockImage.color = new Color(0F, 0F, 0F, Mathf.MoveTowards(BlockImage.color.a, 0F, Time.unscaledDeltaTime * 2F));
                 }
                 else
                 {

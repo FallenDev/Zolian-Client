@@ -9,8 +9,8 @@ namespace SoftKitty.InventoryEngine
         private IEnumerator Start()
         {
             while (ItemManager.PlayerEquipmentHolder == null) yield return 1;
-            yield return new WaitForSeconds(0.5F);
-            GetComponentInChildren<StatsUi>(true).Init(ItemManager.PlayerEquipmentHolder, ItemManager.PlayerEquipmentHolder.BaseStats.ToArray());
+            yield return new WaitForSecondsRealtime(0.5F);
+            GetComponentInChildren<StatsUi>(true).Init(ItemManager.PlayerEquipmentHolder);
         }
     }
 }

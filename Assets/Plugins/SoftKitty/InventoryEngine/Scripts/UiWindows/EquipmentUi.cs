@@ -32,7 +32,7 @@ namespace SoftKitty.InventoryEngine
             mEquipHolder = _equipHolder;
             mInventoryHolder = _inventoryHolder;
             mInventoryHolder.RegisterItemUseCallback(OnInventoryItemClick);
-            StatsScript.Init(_equipHolder, _equipHolder.BaseStats.ToArray());
+            StatsScript.Init(_equipHolder);
             TitleText.text = _name.ToUpper();
             if (ItemManager.instance.GetAtttibute(ItemManager.instance.LevelAttributeKey) !=null)
             {

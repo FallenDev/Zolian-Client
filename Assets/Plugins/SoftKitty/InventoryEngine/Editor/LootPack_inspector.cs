@@ -269,8 +269,24 @@ namespace SoftKitty.InventoryEngine
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.Space(30);
-                GUILayout.Label(new GUIContent("Random Upgrade Level:", "Will the items have random upgrade level?"), GUILayout.Width(180));
+                GUILayout.Label(new GUIContent("Random Enhancing Level:", "Will the items have random Enhancing Level?"), GUILayout.Width(180));
                 myTarget.RandomLevel = EditorGUILayout.Toggle(myTarget.RandomLevel);
+                GUILayout.EndHorizontal();
+
+                if (myTarget.RandomLevel) {
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    GUILayout.Label(new GUIContent("Maximum Enhancing Level:", "Maximum Enhancing Level the random result can be."), GUILayout.Width(180));
+                    myTarget.MaxiumEnhancingLevel = EditorGUILayout.IntSlider(myTarget.MaxiumEnhancingLevel,1, Manager.MaxiumEnhancingLevel);
+                    GUILayout.EndHorizontal();
+                }
+            }
+
+            if (Manager.EnableEnchanting) {
+                GUILayout.BeginHorizontal();
+                GUILayout.Space(30);
+                GUILayout.Label(new GUIContent("Random Enchantments:", "Will the items have random Enchantments?"), GUILayout.Width(180));
+                myTarget.RandomEnchantment = EditorGUILayout.Toggle(myTarget.RandomEnchantment);
                 GUILayout.EndHorizontal();
             }
 

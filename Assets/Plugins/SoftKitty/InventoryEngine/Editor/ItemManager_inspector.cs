@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using System.IO;
 
 
 namespace SoftKitty.InventoryEngine
@@ -176,9 +177,11 @@ namespace SoftKitty.InventoryEngine
                     "This prefab will not be destroyed when switching scenes, and its script will prevent duplication.", MessageType.Info,true);
                 GUILayout.EndHorizontal();
 
+                
+
                 GUILayout.BeginHorizontal();
                 GUILayout.Space(30);
-                GUI.backgroundColor = new Color(1F,0.8F,0.1F,1F);
+                GUI.backgroundColor = new Color(0.1F,1F,0.4F,1F);
                 if (GUILayout.Button(new GUIContent("Help","Click to open the UserGuide.pdf"), GUILayout.Width(120)))
                 {
                     string _path = Application.dataPath.Substring(0, Application.dataPath.Length-6) + _thePath.Replace("Editor", "Documentation") + "UserGuide.pdf";
@@ -193,6 +196,10 @@ namespace SoftKitty.InventoryEngine
                 {
                     if (EditorUtility.DisplayDialog("Reset the database", "Are you sure you want to RESET the whole database? All settins will be reset to default.", "Confirm", "Cancel"))
                     {
+                        if (Directory.Exists(Application.dataPath + "/../" + myTarget.SavePathRoot))
+                        {
+                            Directory.Delete(Application.dataPath + "/../" + myTarget.SavePathRoot, true);
+                        }
                         myTarget.items.Clear();
                         myTarget.itemEnchantments.Clear();
                         myTarget.SocketedCategoryFilter = 0;
@@ -203,6 +210,10 @@ namespace SoftKitty.InventoryEngine
                         myTarget.EnchantingCategoryID = 0;
                         myTarget.EnchantingCurrencyType = 0;
                         myTarget.CraftingMaterialCategoryID = 0;
+                        myTarget.EnableCrafting = false;
+                        myTarget.EnableEnchanting = false;
+                        myTarget.EnableEnhancing = false;
+                        myTarget.EnableSocketing = false;
                         myTarget.itemAttributes.Clear();
                         myTarget.currencies.Clear();
                         myTarget.itemQuality.Clear();
@@ -215,6 +226,27 @@ namespace SoftKitty.InventoryEngine
                 }
 
                 GUI.backgroundColor = _backgroundColor;
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Space(30);
+                GUI.backgroundColor = Color.yellow;
+                if (GUILayout.Button(new GUIContent("Clear Saved Data (Editor)", "Clear the data saved in the editor."), GUILayout.Width(250)))
+                {
+                    if (Directory.Exists(Application.dataPath + "/../" + myTarget.SavePathRoot))
+                    {
+                        Directory.Delete(Application.dataPath + "/../" + myTarget.SavePathRoot, true);
+                        EditorUtility.DisplayDialog("Master Inventory Engine", "All saved data (Editor) has been deleted!", "OK");
+                    }
+                    else
+                    {
+                        EditorUtility.DisplayDialog("Master Inventory Engine", "No saved data (Editor) found.", "OK");
+                    }
+                }
+                GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                GUILayout.Space(30);
+                GUILayout.Label("Make sure to 'Clear Saved Data' if you have made any changes.");
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
@@ -238,7 +270,7 @@ namespace SoftKitty.InventoryEngine
                     GUILayout.Space(30);
                     GUILayout.Label(new GUIContent("Canvas GameObject Tag:", "[Optional] Specify the tag of your main Canvas GameObject. This ensures the system finds the correct canvas, especially in scenes with multiple canvases."),GUILayout.Width(160));
                     GUILayout.Space(10);
-                    myTarget.CanvasTag = GUILayout.TextField(myTarget.CanvasTag,GUILayout.Width(120));
+                    myTarget.CanvasTag = GUILayout.TextField(myTarget.CanvasTag,GUILayout.Width(170));
                     if (GUILayout.Button("X",GUILayout.Width(30))) {
                         myTarget.CanvasTag = "";
                         EditorGUI.FocusTextInControl(null);
@@ -252,6 +284,33 @@ namespace SoftKitty.InventoryEngine
                     EditorGUILayout.HelpBox("[Optional] Specify the tag of your main Canvas GameObject. This ensures the system finds the correct canvas, especially in scenes with multiple canvases.", MessageType.Info, true);
                     GUILayout.EndHorizontal();
 
+                    EditorGUILayout.Separator();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    GUILayout.Label(new GUIContent("SaveData root folder name:", "Specify the name of the save data root folder, the folder will be located in the game install folder."), GUILayout.Width(160));
+                    GUILayout.Space(10);
+                    myTarget.SavePathRoot = GUILayout.TextField(myTarget.SavePathRoot,GUILayout.Width(200F));
+                    GUILayout.EndHorizontal();
+
+                    GUI.backgroundColor = Color.black;
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    GUI.color = new Color(0F,0.7F,1F,1F);
+                    GUILayout.Box("[Editor] ",_titleButtonStyle, GUILayout.Width(50));
+                    GUI.color = Color.white;
+                    GUILayout.Box("Project Root Folder/" + myTarget.SavePathRoot + "/", _titleButtonStyle, GUILayout.Width(320));
+                    GUILayout.EndHorizontal();
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    GUI.color = new Color(0F, 1F, 0.5F, 1F);
+                    GUILayout.Box("[Build] ", _titleButtonStyle, GUILayout.Width(50));
+                    GUI.color = Color.white;
+                    GUILayout.Box("Game Install Folder/" + myTarget.SavePathRoot + "/", _titleButtonStyle, GUILayout.Width(320));
+                    GUILayout.EndHorizontal();
+
+                    GUI.backgroundColor = Color.white;
+                    GUI.color = Color.white;
                     EditorGUILayout.Separator();
 
                     GUILayout.BeginHorizontal();
@@ -465,6 +524,79 @@ namespace SoftKitty.InventoryEngine
                         GUI.backgroundColor = Color.white;
                         GUILayout.EndHorizontal();
                     }
+                    EditorGUILayout.Separator();
+                    EditorGUILayout.Separator();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    GUILayout.Label("Dynamic Messages:", GUILayout.Width(400));
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(50);
+                    GUI.backgroundColor = _buttonColor;
+                    GUILayout.Box("Adding item when bag is full:", _titleButtonStyle,GUILayout.Width(370));
+                    GUI.backgroundColor = Color.white;
+                    GUILayout.EndHorizontal();
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(50);
+                    GUI.backgroundColor = Color.black;
+                    myTarget.msgBagFull= GUILayout.TextField(myTarget.msgBagFull);
+                    GUI.backgroundColor = Color.white;
+                    GUILayout.EndHorizontal();
+
+                    EditorGUILayout.Separator();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(50);
+                    GUI.backgroundColor = _buttonColor;
+                    GUILayout.Box("Can not use item because of the restriction setting:", _titleButtonStyle, GUILayout.Width(370));
+                    GUI.backgroundColor = Color.white;
+                    GUILayout.EndHorizontal();
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(50);
+                    GUILayout.Label("{name} = restriction attribute name; {value} = restriction attribute value required;");
+                    GUILayout.EndHorizontal();
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(50);
+                    GUI.backgroundColor = Color.black;
+                    myTarget.msgItemUseRestricted = GUILayout.TextField(myTarget.msgItemUseRestricted);
+                    GUI.backgroundColor = Color.white;
+                    GUILayout.EndHorizontal();
+
+                    EditorGUILayout.Separator();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(50);
+                    GUI.backgroundColor = _buttonColor;
+                    GUILayout.Box("Can not assign item to a slot:", _titleButtonStyle, GUILayout.Width(370));
+                    GUI.backgroundColor = Color.white;
+                    GUILayout.EndHorizontal();
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(50);
+                    GUI.backgroundColor = Color.black;
+                    myTarget.msgItemAssign = GUILayout.TextField(myTarget.msgItemAssign);
+                    GUI.backgroundColor = Color.white;
+                    GUILayout.EndHorizontal();
+
+                    EditorGUILayout.Separator();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(50);
+                    GUI.backgroundColor = _buttonColor;
+                    GUILayout.Box("Failed when enhancing an item:", _titleButtonStyle, GUILayout.Width(370));
+                    GUI.backgroundColor = Color.white;
+                    GUILayout.EndHorizontal();
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(50);
+                    GUILayout.Label("{name} = the item name;");
+                    GUILayout.EndHorizontal();
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(50);
+                    GUI.backgroundColor = Color.black;
+                    myTarget.msgEnhancingFail = GUILayout.TextField(myTarget.msgEnhancingFail);
+                    GUI.backgroundColor = Color.white;
+                    GUILayout.EndHorizontal();
 
                     EditorGUILayout.Separator();
                 }
@@ -1815,6 +1947,12 @@ namespace SoftKitty.InventoryEngine
                             if (GUILayout.Button(new GUIContent(myTarget.items[i].name + " (UID:" + myTarget.items[i].uid.ToString() + ")","Click to expand."), GUILayout.Width(300), GUILayout.Height(20)))
                             {
                                 myTarget.items[i].fold = !myTarget.items[i].fold;
+                                if (myTarget.items[i].fold) {
+                                    for (int u = 0; u < myTarget.items.Count; u++)
+                                    {
+                                        if(u!=i)myTarget.items[u].fold = false;
+                                    }
+                                }
                                 EditorGUI.FocusTextInControl(null);
                             }
                             if (i > 0)
@@ -2164,7 +2302,7 @@ namespace SoftKitty.InventoryEngine
                                     }
                                     
                                     GUI.backgroundColor = Color.white;
-                                    myTarget.items[i].attributes[u].isFixed = GUILayout.Toggle(myTarget.items[i].attributes[u].isFixed, new GUIContent("Static", "Whether this attribute is Static"), GUILayout.Width(55));
+                                    myTarget.items[i].attributes[u].isFixed = GUILayout.Toggle(myTarget.items[i].attributes[u].isFixed, new GUIContent("Static", "Whether this attribute is Static, uncheck it for rogue-like games to have random stats for this item."), GUILayout.Width(55));
 
                                     GUI.color = u > 0 ? Color.white : Color.gray;
                                     if (GUILayout.Button(new GUIContent(upIcon, "Move this attribute up."), _toolButtonStyle, GUILayout.Width(15)))
@@ -2742,6 +2880,7 @@ namespace SoftKitty.InventoryEngine
                                 _newItem.actions.Clear();
                                 _newItem.craftMaterials.Clear();
                                 _newItem.tags.Clear();
+                                _newItem.customData.Clear();
                             }
                             else
                             {
@@ -2749,6 +2888,12 @@ namespace SoftKitty.InventoryEngine
                             }
                             _newItem.uid = myTarget.items.Count;
                             _newItem.fold = true;
+
+                            for (int u = 0; u < myTarget.items.Count; u++)
+                            {
+                                myTarget.items[u].fold = false;
+                            }
+
                             myTarget.items.Add(_newItem);
                             _valueChanged = true;
                             EditorGUI.FocusTextInControl(null);

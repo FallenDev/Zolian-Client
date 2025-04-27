@@ -12,6 +12,8 @@ namespace SoftKitty.InventoryEngine
         public bool SelectableSlot = true;
         [Header("[Whether display the XP progress bar.]")]
         public bool EnableXP = true;
+        [Header("[Whether display the player's level on the XP progress bar.]")]
+        public bool DisplayLevel = true;
         [Header("[Setup the ActionBar Data.]")]
         public List<ActionSlotSet> SlotData=new List<ActionSlotSet>();
         [Header("[Save path of the ActionBar data.]")]
@@ -34,7 +36,7 @@ namespace SoftKitty.InventoryEngine
         private string ProgressBarHintString = "";
         private int SelectedSlot = 0;
         private int LastSelectedSlot = -1;
-        private float xp;
+        private float xp=-1;
         private float mxp;
         #endregion
 
@@ -52,11 +54,9 @@ namespace SoftKitty.InventoryEngine
             yield return 2;
             if (SavePath.Length > 0)//Check if the save path is null;
             {
-                string _dirPath = SavePath.Replace(Path.GetFileName(SavePath), "");
-                if (!Directory.Exists(_dirPath)) Directory.CreateDirectory(_dirPath);//There might be some sub folder is missing within the save path, create them when needed.
-                if (File.Exists(SavePath))//Check if the save file exist
+                if (File.Exists(ItemManager.GetFullSavePath(SavePath)))//Check if the save file exist
                 {
-                    string _data = File.ReadAllText(SavePath, System.Text.Encoding.UTF8);
+                    string _data = File.ReadAllText(ItemManager.GetFullSavePath(SavePath), System.Text.Encoding.UTF8);
                     Load(_data);
                 }
             }
@@ -133,6 +133,7 @@ namespace SoftKitty.InventoryEngine
                     mxp = ItemManager.PlayerEquipmentHolder.GetBaseStatsValue(ItemManager.instance.MaxXpAttributeKey);
                     SetProgress(xp, mxp);
                     SetProgressHint("Level. "+ Mathf.FloorToInt( ItemManager.PlayerEquipmentHolder.GetBaseStatsValue(ItemManager.instance.LevelAttributeKey)).ToString());
+                    if (DisplayLevel) ProgressText.text += "  ( Level." + Mathf.FloorToInt(ItemManager.PlayerEquipmentHolder.GetBaseStatsValue(ItemManager.instance.LevelAttributeKey)).ToString() + " )";
                 }
             }
         }
@@ -184,7 +185,7 @@ namespace SoftKitty.InventoryEngine
                     }
                 }
                 string _json = JsonUtility.ToJson(_saveRoot);
-                File.WriteAllText(SavePath, _json,System.Text.Encoding.UTF8);
+                File.WriteAllText(ItemManager.GetFullSavePath(SavePath), _json,System.Text.Encoding.UTF8);
             }
         }
         public void SetSelectedSlot(int _index) //Set a slot to be selected

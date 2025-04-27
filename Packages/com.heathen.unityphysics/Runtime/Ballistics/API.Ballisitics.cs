@@ -1,5 +1,6 @@
 ﻿#if HE_SYSCORE
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace HeathenEngineering.UnityPhysics.API
@@ -1023,6 +1024,7 @@ namespace HeathenEngineering.UnityPhysics.API
                 (start, velocity, 0f),
             };
 
+            resolution = math.max(resolution, 0.001f);
             var currentPos = start;
             var currentVel = velocity;
             var timeSum = 0f;

@@ -165,7 +165,7 @@ namespace SoftKitty.InventoryEngine
                         if (LimitedByOwner != null && _source.Holder != LimitedByOwner && _source.Holder!=Holder) return;
                         if (_source.LimitedByOwner != null && Holder != _source.LimitedByOwner && _source.Holder != Holder) return;
                         if ((Holder.Type == InventoryHolder.HolderType.PlayerEquipment || Holder.Type == InventoryHolder.HolderType.NpcEquipment) && !_source.GetItem().AbleToUse(Holder)) return;
-                        if ((_source.Holder.Type == InventoryHolder.HolderType.PlayerEquipment || _source.Holder.Type == InventoryHolder.HolderType.NpcEquipment) && !GetItem().AbleToUse(_source.Holder)) return;
+                        if (GetItem()!=null && (_source.Holder.Type == InventoryHolder.HolderType.PlayerEquipment || _source.Holder.Type == InventoryHolder.HolderType.NpcEquipment) && !GetItem().AbleToUse(_source.Holder)) return;
                         if (LimitedByTag.Length > 0 && !_source.isTagMatchText(LimitedByTag)) return;
                         if (_source.LimitedByTag.Length > 0 && !isTagMatchText(_source.LimitedByTag) && !isEmpty()) return;
                         if (!RecieveDragging) return;
@@ -258,7 +258,7 @@ namespace SoftKitty.InventoryEngine
                 }
                 if (InputProxy.GetMouseButton(0))
                 {
-                    mouseDownTime += Time.deltaTime;
+                    mouseDownTime += Time.unscaledDeltaTime;
                 }
                 else
                 {

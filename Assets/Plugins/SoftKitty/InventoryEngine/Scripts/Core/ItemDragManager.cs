@@ -36,11 +36,11 @@ namespace SoftKitty.InventoryEngine
         {
             if (playingDeleteAnimation)
             {
-                dropSpeed += 100F * Time.deltaTime;
+                dropSpeed += 100F * Time.unscaledDeltaTime;
                 if (DragItem.transform.position.y > -2000F)
                 {
-                    DragItem.transform.position += Vector3.down * 120F * dropSpeed * Time.deltaTime;
-                    DragItem.transform.localEulerAngles = new Vector3(0F, 0F, DragItem.transform.localEulerAngles.z + Time.deltaTime * rotateSpeed);
+                    DragItem.transform.position += Vector3.down * 120F * dropSpeed * Time.unscaledDeltaTime;
+                    DragItem.transform.localEulerAngles = new Vector3(0F, 0F, DragItem.transform.localEulerAngles.z + Time.unscaledDeltaTime * rotateSpeed);
                 }
                 else
                 {

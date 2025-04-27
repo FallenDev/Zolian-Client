@@ -15,7 +15,7 @@ namespace SoftKitty.InventoryEngine
         public RectTransform Progress;
         public Text NumberText;
         public ItemIcon ResultItem;
-        public Animation ResultPop;
+        public AdvAnimation ResultPop;
         public CanvasGroup Root;
         private float FadeTime = 0F;
         #endregion
@@ -56,7 +56,7 @@ namespace SoftKitty.InventoryEngine
             }
             else
             {
-                FadeTime = Mathf.MoveTowards(FadeTime,0F,Time.deltaTime);
+                FadeTime = Mathf.MoveTowards(FadeTime,0F,Time.unscaledDeltaTime);
                 if (FadeTime > 0F)
                 {
                     NumberText.text = "Done!";

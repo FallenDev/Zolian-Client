@@ -14,6 +14,8 @@ namespace SoftKitty.InventoryEngine
         private static HoverInformation instance;
         private static InventoryHolder CompareHolder;
         public RectTransform Rect;
+        public RectTransform PanelRect;
+        public RectTransform StatsRoot;
         public CanvasGroup Group;
         public Text NameText;
         public Text TypeText;
@@ -56,9 +58,10 @@ namespace SoftKitty.InventoryEngine
 
         public void _showHoverInfo(ItemIcon _source, Item _item, int _num, RectTransform _anchor, float _priceMultiplier,string _clickAction= "Use", bool _promoSplit = true, bool _promoFav = true, bool _promoDrop = true)
         {
-            if (HoverSource == _source) return;
+            if (HoverSource == _source || _item==null) return;
 
             Rect.position = _anchor.position;
+           
             Group.alpha = 1F;
             Group.gameObject.SetActive(true);
             NameText.text = _item.nameWithAffixing + (_item.upgradeLevel > 0 ? " +" + _item.upgradeLevel.ToString() : "");
@@ -217,6 +220,8 @@ namespace SoftKitty.InventoryEngine
                     SocketSlots[i].SetActive(false);
                 }
             }
+            LayoutRebuilder.ForceRebuildLayoutImmediate(StatsRoot);
+            PanelRect.sizeDelta = new Vector2(255F,StatsRoot.sizeDelta.y+386F);
             HoverSource = _source;
         }
 
@@ -245,7 +250,7 @@ namespace SoftKitty.InventoryEngine
         {
             if (Group.alpha > 0F)
             {
-                Group.alpha = Mathf.MoveTowards(Group.alpha, 0F, Time.deltaTime * 4F);
+                Group.alpha = Mathf.MoveTowards(Group.alpha, 0F, Time.unscaledDeltaTime * 4F);
             }
             else if (Group.gameObject.activeSelf)
             {

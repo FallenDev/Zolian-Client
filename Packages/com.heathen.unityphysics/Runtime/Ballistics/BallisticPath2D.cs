@@ -39,7 +39,7 @@ namespace HeathenEngineering.UnityPhysics
             }
         }
 
-        public (Vector2 position, Vector2 velocity, float time) Lerp(float time)
+        public readonly (Vector2 position, Vector2 velocity, float time) Lerp(float time)
         {
             if(steps == null
                 || steps.Length == 0)

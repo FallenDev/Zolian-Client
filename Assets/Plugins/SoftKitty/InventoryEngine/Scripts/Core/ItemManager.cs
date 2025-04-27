@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 namespace SoftKitty.InventoryEngine
 {
@@ -17,6 +18,7 @@ namespace SoftKitty.InventoryEngine
         public List<Enchantment> itemEnchantments = new List<Enchantment>();
         public List<Currency> currencies = new List<Currency>();
         public List<Item> items = new List<Item>();
+        public string SavePathRoot = "SaveData";
 
 
         public string NameAttributeKey = "name";
@@ -81,7 +83,12 @@ namespace SoftKitty.InventoryEngine
         public int RandomChanceToLockSocketingSlots = 25;
         public int UnlockSocketingSlotsPrice = 50;
         public int UnlockSocketingSlotsCurrency = 0;
-       
+
+        public string msgBagFull = "Sorry, the bag is full.";
+        public string msgItemUseRestricted = "Sorry, you can not use this item because of your {name} is less than {value}.";
+        public string msgItemAssign = "Sorry, you can not assign this item here.";
+        public string msgEnhancingFail = "Failed! [ <color=#FFA209>{name}</color> ] break into pieces.";
+
 
         #endregion
 
@@ -232,6 +239,20 @@ namespace SoftKitty.InventoryEngine
             instance.PlayerName = _name;
         }
 
+
+        /// <summary>
+        /// Return the full path by providing the sub path with the file name.
+        /// </summary>
+        /// <param name="_fileName"></param>
+        /// <returns></returns>
+        public static string GetFullSavePath(string _fileName)
+        {
+            string _path = Application.dataPath + "/../" + instance.SavePathRoot + "/" + _fileName;
+            if (Path.IsPathRooted(_fileName)) _path= _fileName;
+            string _dirPath = _path.Replace(Path.GetFileName(_fileName), "");
+            if (!Directory.Exists(_dirPath)) Directory.CreateDirectory(_dirPath);//There might be some sub folder is missing within the save path, create them when needed.
+            return _path;
+        }
 
     }
 }

@@ -40,8 +40,8 @@ namespace SoftKitty.InventoryEngine
                 }
                 else if (InputProxy.GetMouseButton(0))
                 {
-                    ButtonHoldTime += Time.deltaTime;
-                    increment = Mathf.MoveTowards(increment, 0.05F, Time.deltaTime * 0.1F);
+                    ButtonHoldTime += Time.unscaledDeltaTime;
+                    increment = Mathf.MoveTowards(increment, 0.05F, Time.unscaledDeltaTime * 0.1F);
                     if (ButtonHoldTime > increment)
                     {
                         AddNum(-1);
@@ -64,8 +64,8 @@ namespace SoftKitty.InventoryEngine
                 }
                 else if (InputProxy.GetMouseButton(0))
                 {
-                    ButtonHoldTime += Time.deltaTime;
-                    increment = Mathf.MoveTowards(increment, 0.05F, Time.deltaTime * 0.1F);
+                    ButtonHoldTime += Time.unscaledDeltaTime;
+                    increment = Mathf.MoveTowards(increment, 0.05F, Time.unscaledDeltaTime * 0.1F);
                     if (ButtonHoldTime > increment)
                     {
                         AddNum(1);

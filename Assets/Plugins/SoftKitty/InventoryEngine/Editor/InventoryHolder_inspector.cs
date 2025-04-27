@@ -110,6 +110,37 @@ namespace SoftKitty.InventoryEngine
             myTarget.SavePath = GUILayout.TextField(myTarget.SavePath);
             GUILayout.EndHorizontal();
 
+            if (myTarget.SavePath.Length > 0)
+            {
+                if (myTarget.SavePath.IndexOf(".")<=0 || myTarget.SavePath.IndexOf(".")> myTarget.SavePath.Length-4) {
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(30);
+                    GUI.color = Color.red;
+                    GUILayout.Label("file name and extension required");
+                    GUILayout.EndHorizontal();
+                }
+                GUI.backgroundColor = Color.black;
+                GUILayout.BeginHorizontal();
+                GUILayout.Space(30);
+                GUI.color = new Color(0F, 0.7F, 1F, 1F);
+                GUILayout.Box("[Editor] ", _titleButtonStyle, GUILayout.Width(50));
+                GUI.color = Color.white;
+                GUILayout.Box("Project Root Folder/" + Manager.SavePathRoot + "/" + myTarget.SavePath, _titleButtonStyle, GUILayout.Width(320));
+                GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                GUILayout.Space(30);
+                GUI.color = new Color(0F, 1F, 0.5F, 1F);
+                GUILayout.Box("[Build] ", _titleButtonStyle, GUILayout.Width(50));
+                GUI.color = Color.white;
+                GUILayout.Box("Game Install Folder/" + Manager.SavePathRoot + "/" + myTarget.SavePath, _titleButtonStyle, GUILayout.Width(320));
+                GUILayout.EndHorizontal();
+                GUI.backgroundColor = Color.white;
+                GUI.color = Color.white;
+            }
+
+
+            EditorGUILayout.Separator();
+
 
 
             GUILayout.BeginHorizontal();
@@ -774,99 +805,102 @@ namespace SoftKitty.InventoryEngine
                             }
                             GUI.color = Color.white;
 
-                            if (Manager.EnableEnhancing && myTarget.Stacks[i].Item.type == Manager.EnhancingCategoryID)
+                            if (myTarget.Stacks[i].Item != null)
                             {
-                                GUILayout.BeginHorizontal();
-                                GUILayout.Space(80);
-                                GUILayout.Label("Enhancing Level: ", GUILayout.Width(120));
-                                myTarget.Stacks[i].Item.upgradeLevel = EditorGUILayout.IntSlider(myTarget.Stacks[i].Item.upgradeLevel, 0, Manager.MaxiumEnhancingLevel, GUILayout.Width(230));
-                                GUILayout.EndHorizontal();
-                            }
-
-                            if (Manager.EnableEnchanting && Manager.itemEnchantments.Count > 0 && myTarget.Stacks[i].Item.type == Manager.EnchantingCategoryID)
-                            {
-                                GUILayout.BeginHorizontal();
-                                GUILayout.Space(80);
-                                GUILayout.Label("Enchantments (" + myTarget.Stacks[i].Item.enchantments.Count + "): ", GUILayout.Width(120));
-                                GUI.backgroundColor = _buttonColor;
-                                if (GUILayout.Button("+", GUILayout.Width(30)))
-                                {
-                                    myTarget.Stacks[i].Item.enchantments.Add(0);
-                                }
-                                GUI.backgroundColor = _backgroundColor;
-                                GUILayout.EndHorizontal();
-
-                                for (int u = myTarget.Stacks[i].Item.enchantments.Count - 1; u >= 0; u--)
+                                if (Manager.EnableEnhancing && myTarget.Stacks[i].Item.type == Manager.EnhancingCategoryID)
                                 {
                                     GUILayout.BeginHorizontal();
-                                    GUILayout.Space(90);
-                                    int _ent = myTarget.Stacks[i].Item.enchantments[u];
-                                    EditorGUI.BeginChangeCheck();
+                                    GUILayout.Space(80);
+                                    GUILayout.Label("Enhancing Level: ", GUILayout.Width(120));
+                                    myTarget.Stacks[i].Item.upgradeLevel = EditorGUILayout.IntSlider(myTarget.Stacks[i].Item.upgradeLevel, 0, Manager.MaxiumEnhancingLevel, GUILayout.Width(230));
+                                    GUILayout.EndHorizontal();
+                                }
 
-                                    _ent = EditorGUILayout.Popup("", _ent, _enchantOptions, GUILayout.Width(120));
-
-                                    if (EditorGUI.EndChangeCheck())
+                                if (Manager.EnableEnchanting && Manager.itemEnchantments.Count > 0 && myTarget.Stacks[i].Item.type == Manager.EnchantingCategoryID)
+                                {
+                                    GUILayout.BeginHorizontal();
+                                    GUILayout.Space(80);
+                                    GUILayout.Label("Enchantments (" + myTarget.Stacks[i].Item.enchantments.Count + "): ", GUILayout.Width(120));
+                                    GUI.backgroundColor = _buttonColor;
+                                    if (GUILayout.Button("+", GUILayout.Width(30)))
                                     {
-                                        myTarget.Stacks[i].Item.enchantments[u] = _ent;
+                                        myTarget.Stacks[i].Item.enchantments.Add(0);
                                     }
+                                    GUI.backgroundColor = _backgroundColor;
+                                    GUILayout.EndHorizontal();
 
-                                    GUILayout.Label(Manager.itemEnchantments[myTarget.Stacks[i].Item.enchantments[u]].GetDescription(), GUILayout.Width(190));
-
-                                    GUI.backgroundColor = Color.red;
-                                    if (GUILayout.Button("X", GUILayout.Width(25)))
+                                    for (int u = myTarget.Stacks[i].Item.enchantments.Count - 1; u >= 0; u--)
                                     {
-                                        myTarget.Stacks[i].Item.enchantments.RemoveAt(u);
+                                        GUILayout.BeginHorizontal();
+                                        GUILayout.Space(90);
+                                        int _ent = myTarget.Stacks[i].Item.enchantments[u];
+                                        EditorGUI.BeginChangeCheck();
+
+                                        _ent = EditorGUILayout.Popup("", _ent, _enchantOptions, GUILayout.Width(120));
+
+                                        if (EditorGUI.EndChangeCheck())
+                                        {
+                                            myTarget.Stacks[i].Item.enchantments[u] = _ent;
+                                        }
+
+                                        GUILayout.Label(Manager.itemEnchantments[myTarget.Stacks[i].Item.enchantments[u]].GetDescription(), GUILayout.Width(190));
+
+                                        GUI.backgroundColor = Color.red;
+                                        if (GUILayout.Button("X", GUILayout.Width(25)))
+                                        {
+                                            myTarget.Stacks[i].Item.enchantments.RemoveAt(u);
+                                        }
+                                        GUI.backgroundColor = _backgroundColor;
+                                        GUILayout.EndHorizontal();
+                                    }
+                                }
+
+                                if (Manager.EnableSocketing && myTarget.Stacks[i].Item.type == Manager.SocketedCategoryFilter)
+                                {
+                                    GUILayout.BeginHorizontal();
+                                    GUILayout.Space(80);
+                                    GUILayout.Label("Socketing Slots (" + myTarget.Stacks[i].Item.socketingSlots.ToString() + "):", GUILayout.Width(120));
+                                    GUI.backgroundColor = myTarget.Stacks[i].Item.socketedItems.Count < Manager.MaxmiumSocketingSlotsNumber ? _buttonColor : Color.gray;
+                                    if (GUILayout.Button("+", GUILayout.Width(30)))
+                                    {
+                                        if (myTarget.Stacks[i].Item.socketedItems.Count < Manager.MaxmiumSocketingSlotsNumber)
+                                        {
+                                            myTarget.Stacks[i].Item.socketedItems.Add(Manager.LockSocketingSlotsByDefault ? -2 : -1);
+                                            myTarget.Stacks[i].Item.socketingSlots = myTarget.Stacks[i].Item.socketedItems.Count;
+                                        }
+                                    }
+                                    GUI.backgroundColor = myTarget.Stacks[i].Item.socketedItems.Count > 0 ? Color.red : Color.gray;
+                                    if (GUILayout.Button("-", GUILayout.Width(30)))
+                                    {
+                                        if (myTarget.Stacks[i].Item.socketedItems.Count > 0)
+                                        {
+                                            myTarget.Stacks[i].Item.socketedItems.RemoveAt(myTarget.Stacks[i].Item.socketedItems.Count - 1);
+                                            myTarget.Stacks[i].Item.socketingSlots = myTarget.Stacks[i].Item.socketedItems.Count;
+                                        }
+                                    }
+                                    GUI.backgroundColor = _backgroundColor;
+                                    GUILayout.EndHorizontal();
+
+                                    GUILayout.BeginHorizontal();
+                                    GUILayout.Space(100);
+                                    for (int u = 0; u < myTarget.Stacks[i].Item.socketedItems.Count; u++)
+                                    {
+                                        GUI.backgroundColor = myTarget.Stacks[i].Item.socketedItems[u] == -2 ? Color.gray : _buttonColor;
+                                        if (GUILayout.Button(new GUIContent(myTarget.Stacks[i].Item.socketedItems[u] == -2 ? "X" : "O", myTarget.Stacks[i].Item.socketedItems[u] == -2 ? "Locked" : "Available"), GUILayout.Width(30)))
+                                        {
+                                            if (myTarget.Stacks[i].Item.socketedItems[u] == -2)
+                                            {
+                                                myTarget.Stacks[i].Item.socketedItems[u] = -1;
+                                            }
+                                            else
+                                            {
+                                                myTarget.Stacks[i].Item.socketedItems[u] = -2;
+                                            }
+                                        }
                                     }
                                     GUI.backgroundColor = _backgroundColor;
                                     GUILayout.EndHorizontal();
                                 }
-                            }
-
-                            if (Manager.EnableSocketing && myTarget.Stacks[i].Item.type == Manager.SocketedCategoryFilter)
-                            {
-                                GUILayout.BeginHorizontal();
-                                GUILayout.Space(80);
-                                GUILayout.Label("Socketing Slots (" + myTarget.Stacks[i].Item.socketingSlots.ToString() + "):", GUILayout.Width(120));
-                                GUI.backgroundColor = myTarget.Stacks[i].Item.socketedItems.Count < Manager.MaxmiumSocketingSlotsNumber ? _buttonColor : Color.gray;
-                                if (GUILayout.Button("+", GUILayout.Width(30)))
-                                {
-                                    if (myTarget.Stacks[i].Item.socketedItems.Count < Manager.MaxmiumSocketingSlotsNumber)
-                                    {
-                                        myTarget.Stacks[i].Item.socketedItems.Add(Manager.LockSocketingSlotsByDefault ? -2 : -1);
-                                        myTarget.Stacks[i].Item.socketingSlots = myTarget.Stacks[i].Item.socketedItems.Count;
-                                    }
-                                }
-                                GUI.backgroundColor = myTarget.Stacks[i].Item.socketedItems.Count > 0 ? Color.red : Color.gray;
-                                if (GUILayout.Button("-", GUILayout.Width(30)))
-                                {
-                                    if (myTarget.Stacks[i].Item.socketedItems.Count > 0)
-                                    {
-                                        myTarget.Stacks[i].Item.socketedItems.RemoveAt(myTarget.Stacks[i].Item.socketedItems.Count - 1);
-                                        myTarget.Stacks[i].Item.socketingSlots = myTarget.Stacks[i].Item.socketedItems.Count;
-                                    }
-                                }
-                                GUI.backgroundColor = _backgroundColor;
-                                GUILayout.EndHorizontal();
-
-                                GUILayout.BeginHorizontal();
-                                GUILayout.Space(100);
-                                for (int u = 0; u < myTarget.Stacks[i].Item.socketedItems.Count; u++)
-                                {
-                                    GUI.backgroundColor = myTarget.Stacks[i].Item.socketedItems[u] == -2 ? Color.gray : _buttonColor;
-                                    if (GUILayout.Button(new GUIContent(myTarget.Stacks[i].Item.socketedItems[u] == -2 ? "X" : "O", myTarget.Stacks[i].Item.socketedItems[u] == -2 ? "Locked" : "Available"), GUILayout.Width(30)))
-                                    {
-                                        if (myTarget.Stacks[i].Item.socketedItems[u] == -2)
-                                        {
-                                            myTarget.Stacks[i].Item.socketedItems[u] = -1;
-                                        }
-                                        else
-                                        {
-                                            myTarget.Stacks[i].Item.socketedItems[u] = -2;
-                                        }
-                                    }
-                                }
-                                GUI.backgroundColor = _backgroundColor;
-                                GUILayout.EndHorizontal();
                             }
                         }
                     }

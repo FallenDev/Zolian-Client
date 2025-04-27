@@ -16,7 +16,6 @@ namespace SoftKitty.InventoryEngine
         #region Variables
         public GameObject StatPrefab;
         private InventoryHolder Holder;
-        private Dictionary<string, Attribute> BaseDic = new Dictionary<string, Attribute>();
         private Dictionary<string, ListItem> StatList=new Dictionary<string, ListItem>();
         private Color StatColor;
         private bool Inited = false;
@@ -43,7 +42,7 @@ namespace SoftKitty.InventoryEngine
                             StartCoroutine(PopStat(StatList[ItemManager.instance.itemAttributes[i].key].mTexts[1], Color.red));
                         }
                         StatList[ItemManager.instance.itemAttributes[i].key].mValue = _currentValue;
-                        StatList[ItemManager.instance.itemAttributes[i].key].mTexts[1].text = _currentValue.ToString()+ ItemManager.instance.itemAttributes[i].suffixes;
+                        StatList[ItemManager.instance.itemAttributes[i].key].mTexts[1].text = (Mathf.RoundToInt( _currentValue*10)*0.1F).ToString()+ ItemManager.instance.itemAttributes[i].suffixes;
                     }
                 }
             }
@@ -56,15 +55,15 @@ namespace SoftKitty.InventoryEngine
         {
             float t = 0F;
             while (t<1F) {
-                t += Time.deltaTime * 10F;
+                t += Time.unscaledDeltaTime * 10F;
                 _stat.color = Color.Lerp(StatColor, _popColor,t);
                 _stat.transform.localScale = Vector3.one * (1F + t * 0.3F);
                 yield return 1;
             }
-            yield return new WaitForSeconds(0.5F);
+            yield return new WaitForSecondsRealtime(0.5F);
             while (t > 0F)
             {
-                t -= Time.deltaTime*3F;
+                t -= Time.unscaledDeltaTime*3F;
                 _stat.color = Color.Lerp(StatColor, _popColor, t);
                 _stat.transform.localScale = Vector3.one * (1F + t * 0.3F);
                 yield return 1;
@@ -74,9 +73,7 @@ namespace SoftKitty.InventoryEngine
         }
         private float GetValue(string _key)
         {
-            float _base = 0F;
-            if (BaseDic.ContainsKey(_key)) _base = BaseDic[_key].GetFloat();
-            return _base + Holder.GetAttributeValue(_key);
+            return Holder.GetAttributeValue(_key,true);
         }
         #endregion
 
@@ -85,27 +82,10 @@ namespace SoftKitty.InventoryEngine
         /// </summary>
         /// <param name="_equipHolder"></param>
         /// <param name="_baseAttributes"></param>
-        public void Init(InventoryHolder _equipHolder, Attribute[] _baseAttributes)
+        public void Init(InventoryHolder _equipHolder)
         {
             StatColor = StatPrefab.GetComponent<ListItem>().mTexts[1].color;
             Holder = _equipHolder;
-            BaseDic.Clear();
-            if (_baseAttributes != null)
-            {
-                foreach (Attribute att in _baseAttributes)
-                {
-                    if (ItemManager.instance.GetAtttibute(att.key) != null)
-                    {
-                        if (!ItemManager.instance.GetAtttibute(att.key).stringValue)
-                        {
-                            float _value = att.GetFloat();
-                            Attribute _newAtt = ItemManager.instance.GetAtttibute(att.key).Copy();
-                            _newAtt.UpdateValue(_value);
-                            BaseDic.Add(att.key, _newAtt);
-                        }
-                    }
-                }
-            }
             for(int i=0;i<ItemManager.instance.itemAttributes.Count;i++) {
                 if (ItemManager.instance.itemAttributes[i].visibleInStatsPanel && ItemManager.instance.itemAttributes[i].isNumber() && !StatList.ContainsKey(ItemManager.instance.itemAttributes[i].key))
                 {
@@ -114,7 +94,7 @@ namespace SoftKitty.InventoryEngine
                     _newStat.GetComponent<ListItem>().mTexts[0].text = ItemManager.instance.itemAttributes[i].name+" : ";
                     _newStat.SetActive(true);
                     _newStat.GetComponent<ListItem>().mValue = GetValue(ItemManager.instance.itemAttributes[i].key);
-                    _newStat.GetComponent<ListItem>().mTexts[1].text = GetValue(ItemManager.instance.itemAttributes[i].key).ToString()+ ItemManager.instance.itemAttributes[i].suffixes;
+                    _newStat.GetComponent<ListItem>().mTexts[1].text = (Mathf.RoundToInt(GetValue(ItemManager.instance.itemAttributes[i].key) * 10) * 0.1F).ToString()+ ItemManager.instance.itemAttributes[i].suffixes;
                     StatList.Add(ItemManager.instance.itemAttributes[i].key,_newStat.GetComponent<ListItem>());
                 }
             }

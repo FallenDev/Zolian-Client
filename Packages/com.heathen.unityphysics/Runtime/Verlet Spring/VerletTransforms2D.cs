@@ -2,7 +2,9 @@
 
 using UnityEngine;
 using System.Collections.Generic;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using Unity.Mathematics;
 
 namespace HeathenEngineering.UnityPhysics

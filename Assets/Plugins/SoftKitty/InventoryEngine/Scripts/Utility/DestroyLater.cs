@@ -12,7 +12,7 @@ namespace SoftKitty.InventoryEngine
         public float WaitTime = 2.5F;
         IEnumerator Start()
         {
-            yield return new WaitForSeconds(WaitTime);
+            yield return new WaitForSecondsRealtime(WaitTime);
             Destroy(gameObject);
         }
     }

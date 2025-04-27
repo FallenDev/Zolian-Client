@@ -57,10 +57,12 @@
       "hash": "069db15992e99ce0db176ffc5145a27d30873e87"
     },
     "com.unity.2d.pixel-perfect": {
-      "version": "5.0.3",
+      "version": "5.1.0",
       "depth": 0,
       "source": "registry",
-      "dependencies": {},
+      "dependencies": {
+        "com.unity.modules.imgui": "1.0.0"
+      },
       "url": "https://packages.unity.com"
     },
     "com.unity.2d.sprite": {
@@ -79,7 +81,7 @@
       }
     },
     "com.unity.2d.tilemap.extras": {
-      "version": "4.1.0",
+      "version": "4.3.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -161,12 +163,12 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.entities.graphics": {
-      "version": "1.3.2",
+      "version": "1.4.12",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.entities": "1.3.2",
-        "com.unity.render-pipelines.core": "14.0.9",
+        "com.unity.entities": "1.3.14",
+        "com.unity.render-pipelines.core": "14.0.10",
         "com.unity.modules.particlesystem": "1.0.0"
       },
       "url": "https://packages.unity.com"
@@ -275,7 +277,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.render-pipelines.core": {
-      "version": "17.0.4",
+      "version": "17.1.0",
       "depth": 0,
       "source": "builtin",
       "dependencies": {
@@ -290,12 +292,12 @@
       }
     },
     "com.unity.render-pipelines.universal": {
-      "version": "17.0.4",
+      "version": "17.1.0",
       "depth": 0,
       "source": "builtin",
       "dependencies": {
-        "com.unity.render-pipelines.core": "17.0.4",
-        "com.unity.shadergraph": "17.0.4",
+        "com.unity.render-pipelines.core": "17.1.0",
+        "com.unity.shadergraph": "17.1.0",
         "com.unity.render-pipelines.universal-config": "17.0.3"
       }
     },
@@ -349,11 +351,11 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.shadergraph": {
-      "version": "17.0.4",
+      "version": "17.1.0",
       "depth": 0,
       "source": "builtin",
       "dependencies": {
-        "com.unity.render-pipelines.core": "17.0.4",
+        "com.unity.render-pipelines.core": "17.1.0",
         "com.unity.searcher": "4.9.3"
       }
     },

@@ -87,8 +87,8 @@ namespace SoftKitty.InventoryEngine
         public override void Update()
         {
             if (!inited) return;
-            InventoryRect.anchoredPosition = Vector2.Lerp(InventoryRect.anchoredPosition, new Vector2(SelectedTab == 0 ? 90.5F : 0F, -82F), Time.deltaTime * 20F);
-            InventoryRect.sizeDelta = Vector2.Lerp(InventoryRect.sizeDelta, new Vector2(SelectedTab == 0 ? -189F : -55F, -254.5F), Time.deltaTime * 20F);
+            InventoryRect.anchoredPosition = Vector2.Lerp(InventoryRect.anchoredPosition, new Vector2(SelectedTab == 0 ? 90.5F : 0F, -82F), Time.unscaledDeltaTime * 20F);
+            InventoryRect.sizeDelta = Vector2.Lerp(InventoryRect.sizeDelta, new Vector2(SelectedTab == 0 ? -189F : -55F, -254.5F), Time.unscaledDeltaTime * 20F);
 
             switch (SelectedTab)
             {
@@ -142,8 +142,8 @@ namespace SoftKitty.InventoryEngine
                 if (!Holder.GetCraftingFailed())
                 {
                     CraftingResultNumber.text = "+ 1";
-                    CraftingResultItem.GetComponentInChildren<Animation>().Stop();
-                    CraftingResultItem.GetComponentInChildren<Animation>().Play();
+                    CraftingResultItem.GetComponentInChildren<AdvAnimation>().Stop();
+                    CraftingResultItem.GetComponentInChildren<AdvAnimation>().Play();
                     SoundManager.Play2D("CraftSuccess");
                     RefreshCraftingArea();
                     RefreshInventoryItems();
@@ -157,13 +157,13 @@ namespace SoftKitty.InventoryEngine
             if (NumberInput.instance != null)
             {
                 BlockImage.gameObject.SetActive(true);
-                BlockImage.color = new Color(0F, 0F, 0F, Mathf.Lerp(BlockImage.color.a, 0.94F, Time.deltaTime * 3F));
+                BlockImage.color = new Color(0F, 0F, 0F, Mathf.Lerp(BlockImage.color.a, 0.94F, Time.unscaledDeltaTime * 3F));
             }
             else
             {
                 if (BlockImage.color.a > 0F)
                 {
-                    BlockImage.color = new Color(0F, 0F, 0F, Mathf.MoveTowards(BlockImage.color.a, 0F, Time.deltaTime * 2F));
+                    BlockImage.color = new Color(0F, 0F, 0F, Mathf.MoveTowards(BlockImage.color.a, 0F, Time.unscaledDeltaTime * 2F));
                 }
                 else
                 {
@@ -774,7 +774,7 @@ namespace SoftKitty.InventoryEngine
             while (_progress < 1F)
             {
                 yield return 1;
-                _progress = Mathf.MoveTowards(_progress, 1F, Time.deltaTime * (1F / ItemManager.instance.EnhancingTime));
+                _progress = Mathf.MoveTowards(_progress, 1F, Time.unscaledDeltaTime * (1F / ItemManager.instance.EnhancingTime));
                 EnhancingProgressBar.localScale = new Vector3(_progress, 1F, 1F);
             }
             yield return 1;
@@ -784,10 +784,10 @@ namespace SoftKitty.InventoryEngine
                  Holder.RemoveItem(Mathf.FloorToInt(ItemManager.instance.EnhancingMaterials[i].x), Mathf.FloorToInt(ItemManager.instance.EnhancingMaterials[i].y));
             }
             Holder.AddCurrency(ItemManager.instance.EnhancingCurrencyType, -ItemManager.instance.EnhancingCurrencyNeed);
-            EnhancingResultItem.GetComponentInChildren<Animation>().Stop();
+            EnhancingResultItem.GetComponentInChildren<AdvAnimation>().Stop();
             if (Random.Range(0, 100) < ItemManager.instance.EnhancingSuccessCurve.Evaluate(EnhancingResultItem.GetItem().upgradeLevel * 1F / ItemManager.instance.MaxiumEnhancingLevel))
             {
-                EnhancingResultItem.GetComponentInChildren<Animation>().Play("CraftingSuccess");
+                EnhancingResultItem.GetComponentInChildren<AdvAnimation>().Play("CraftingSuccess");
                 int _level= Holder.FindItem(EnhancingResultItem.GetItemId(), EnhancingResultItem.GetItem().upgradeLevel, EnhancingResultItem.GetItem().enchantments, EnhancingResultItem.GetItem().socketedItems).Upgrade();
                 EnhancingResultItem.GetItem().upgradeLevel=_level;
                 DynamicMsg.PopItem(EnhancingResultItem.GetItem());
@@ -795,14 +795,14 @@ namespace SoftKitty.InventoryEngine
             }
             else
             {
-                EnhancingResultItem.GetComponentInChildren<Animation>().Play("CraftingFailed");
+                EnhancingResultItem.GetComponentInChildren<AdvAnimation>().Play("CraftingFailed");
                
                 if (ItemManager.instance.DestroyEquipmentWhenFail && EnhancingResultItem.GetItem().upgradeLevel >= ItemManager.instance.DestroyEquipmentWhenFailLevel)
                 {
                     string _name = EnhancingResultItem.GetItem().nameWithAffixing + (EnhancingResultItem.GetItem().upgradeLevel > 0 ? "+" + EnhancingResultItem.GetItem().upgradeLevel.ToString() : "");
                     Holder.DeleteItem(EnhancingResultItem.GetItemId(), EnhancingResultItem.GetItem().upgradeLevel, EnhancingResultItem.GetItem().enchantments, EnhancingResultItem.GetItem().socketedItems);
                     EnhancingResultItem.SetEmpty();
-                    DynamicMsg.PopMsg("Failed!  [ <color=#FFA209>" + _name + "</color> ] break into pieces.");
+                    DynamicMsg.PopMsg(ItemManager.instance.msgEnhancingFail.Replace("{name}", _name));
                 }
                 SoundManager.Play2D("CraftFail");
             }
@@ -825,17 +825,17 @@ namespace SoftKitty.InventoryEngine
             while (_progress < 1F)
             {
                 yield return 1;
-                _progress = Mathf.MoveTowards(_progress, 1F, Time.deltaTime * (1F/ ItemManager.instance.EnchantingTime));
+                _progress = Mathf.MoveTowards(_progress, 1F, Time.unscaledDeltaTime * (1F/ ItemManager.instance.EnchantingTime));
                 EnchantProgressBar.localScale = new Vector3(_progress, 1F, 1F);
             }
             yield return 1;
 
             Holder.RemoveItem(Mathf.FloorToInt(ItemManager.instance.EnchantingMaterial.x), Mathf.FloorToInt(ItemManager.instance.EnchantingMaterial.y));
             Holder.AddCurrency(ItemManager.instance.EnchantingCurrencyType, -ItemManager.instance.EnchantingCurrencyNeed);
-            EnchantResultItem.GetComponentInChildren<Animation>().Stop();
+            EnchantResultItem.GetComponentInChildren<AdvAnimation>().Stop();
             if (Random.Range(0, 100) < ItemManager.instance.EnchantingSuccessRate)
             {
-                EnchantResultItem.GetComponentInChildren<Animation>().Play("CraftingSuccess");
+                EnchantResultItem.GetComponentInChildren<AdvAnimation>().Play("CraftingSuccess");
                 int _count = Random.Range(Mathf.FloorToInt(ItemManager.instance.EnchantmentNumberRange.x), Mathf.FloorToInt(ItemManager.instance.EnchantmentNumberRange.y));
                 List<int> _newEnchantments = new List<int>();
                 for (int i = 0; i < _count; i++) {
@@ -848,7 +848,7 @@ namespace SoftKitty.InventoryEngine
             }
             else
             {
-                EnchantResultItem.GetComponentInChildren<Animation>().Play("CraftingFailed");
+                EnchantResultItem.GetComponentInChildren<AdvAnimation>().Play("CraftingFailed");
                 SoundManager.Play2D("CraftFail");
             }
             Holder.ItemChanged(new Dictionary<Item, int>());

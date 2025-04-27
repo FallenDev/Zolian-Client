@@ -34,7 +34,7 @@ namespace SoftKitty.InventoryEngine
         IEnumerator ActiveWindowLater(UiWindow _window)
         {
             yield return 1;
-            _window.ActiveWindow();
+            if(_window!=null)_window.ActiveWindow();
         }
 
         public static GameObject GetMainCanvas(GameObject _base=null)

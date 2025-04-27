@@ -845,8 +845,8 @@ namespace SoftKitty.InventoryEngine
                 {
                     Attribute _newAtt = att.Copy();
                     _newAtt.Init();
-                    if(att.randomChange >= 100 || _attCount< maximumRandomAttributes)attributes.Add(_newAtt);
-                    if (att.randomChange < 100 && !_newAtt.locked) _attCount++;
+                    if(att.isFixed || _attCount< maximumRandomAttributes)attributes.Add(_newAtt);
+                    if (!att.isFixed && !_newAtt.locked) _attCount++;
                 }
                 craftMaterials.Clear();
                 craftMaterials.AddRange(_ref.craftMaterials);
@@ -933,7 +933,9 @@ namespace SoftKitty.InventoryEngine
             _newItem.socketingTag.Clear();
             _newItem.socketingTag.AddRange(socketingTag);
             _newItem.customData.Clear();
-            _newItem.customData.AddRange(customData);
+            for (int i=0;i< customData.Count;i++) {
+                _newItem.customData.Add(customData[i].Copy());
+            }
 #if MASTER_CHARACTER_CREATOR
             _newItem.equipAppearance= new MasterCharacterCreator.EquipmentAppearance();
             _newItem.equipAppearance.Type = equipAppearance.Type;
@@ -1344,14 +1346,14 @@ namespace SoftKitty.InventoryEngine
         /// <returns></returns>
         public List<int> RandomEnchantment()
         {
-            if (ItemManager.instance.EnableEnchanting && ItemManager.instance.RandomEnchantmentsForNewItem && type== ItemManager.instance.EnchantingCategoryID && Random.Range(0, 100) < ItemManager.instance.EnchantingSuccessRate)
+            if (ItemManager.enchantmentDic.Count>0 && ItemManager.instance.EnableEnchanting && ItemManager.instance.RandomEnchantmentsForNewItem && type== ItemManager.instance.EnchantingCategoryID && Random.Range(0, 100) < ItemManager.instance.EnchantingSuccessRate)
             {
                 List<int> _newEnchantments = new List<int>();
                 int _count = Random.Range(Mathf.FloorToInt(ItemManager.instance.EnchantmentNumberRange.x), Mathf.FloorToInt(ItemManager.instance.EnchantmentNumberRange.y));
                 for (int i = 0; i < _count; i++)
                 {
                     int _uid = Random.Range(0, ItemManager.enchantmentDic.Count);
-                    if (!_newEnchantments.Contains(_uid)) _newEnchantments.Add(_uid);
+                    if (!_newEnchantments.Contains(_uid) && ItemManager.enchantmentDic.ContainsKey(_uid)) _newEnchantments.Add(_uid);
                 }
                 ReplaceEnchantment(_newEnchantments);
                 return _newEnchantments;
@@ -1987,6 +1989,8 @@ namespace SoftKitty.InventoryEngine
         public ItemSave[] items;
         public ItemSave[] hiddenItems;
         public int[] currency;
+        public string[] baseAttributeKey = new string[0];
+        public string[] baseAttributeValue = new string[0];
     }
 
     [System.Serializable]
@@ -2149,6 +2153,13 @@ namespace SoftKitty.InventoryEngine
     {
         public string key;
         public Object value;
+        public CustomField Copy()
+        {
+            CustomField _newObj = new CustomField();
+            _newObj.key = key;
+            _newObj.value = value;
+            return _newObj;
+        }
     }
     #endregion
 

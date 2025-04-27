@@ -96,8 +96,8 @@ namespace SoftKitty.InventoryEngine
 
         void Update()
         {
-            Icon.transform.localScale = Vector3.Lerp(Icon.transform.localScale, Vector3.one * (isHover ? 1F : 0.9F), Time.deltaTime * 8F);
-            OutlineTimer = Mathf.MoveTowards(OutlineTimer,0F,Time.deltaTime);
+            Icon.transform.localScale = Vector3.Lerp(Icon.transform.localScale, Vector3.one * (isHover ? 1F : 0.9F), Time.unscaledDeltaTime * 8F);
+            OutlineTimer = Mathf.MoveTowards(OutlineTimer,0F,Time.unscaledDeltaTime);
             if (GlowIcon) GlowIcon.transform.localScale = new Vector3(Icon.transform.localScale.x*1.1F, Icon.transform.localScale.y,1F);
             if (Outline)
             {

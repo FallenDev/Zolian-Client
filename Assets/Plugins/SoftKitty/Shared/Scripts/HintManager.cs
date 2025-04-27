@@ -31,7 +31,7 @@ namespace SoftKitty
         {
             if (hintTime > 0F)
             {
-                hintTime -= Time.deltaTime;
+                hintTime -= Time.unscaledDeltaTime;
                 if (!HintBg.gameObject.activeSelf) HintBg.gameObject.SetActive(true);
                 HintBg.alpha = Mathf.Clamp01(hintTime * 4F);
                 HintBg.GetComponent<RectTransform>().sizeDelta = new Vector2(TextContent.rectTransform.sizeDelta.x + 50F, 35F);

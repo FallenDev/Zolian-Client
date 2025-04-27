@@ -141,14 +141,23 @@ namespace SoftKitty.InventoryEngine
         {
             if (Type == HolderType.PlayerInventory)
             {
+                if (ItemManager.PlayerInventoryHolder != null)
+                {
+                    Debug.LogError("Found duplicated PlayerInventoryHolder,  make sure to delete the old one before creating a new one.");
+                    return;
+                }
                 ItemManager.PlayerInventoryHolder = this;
             }
             else if (Type == HolderType.PlayerEquipment)
             {
+                if (ItemManager.PlayerEquipmentHolder != null)
+                {
+                    Debug.LogError("Found duplicated PlayerEquipmentHolder,  make sure to delete the old one before creating a new one.");
+                    return;
+                }
                 ItemManager.PlayerEquipmentHolder = this;
                 HoverInformation.SetCompareHolder(this);
             }
-           
         }
 
         private IEnumerator Start()
@@ -157,11 +166,9 @@ namespace SoftKitty.InventoryEngine
             Currency.Init();
             if (SavePath.Length > 0)//Check if the save path is null;
             {
-                string _dirPath= SavePath.Replace(Path.GetFileName(SavePath),"");
-                if (!Directory.Exists(_dirPath)) Directory.CreateDirectory(_dirPath);//There might be some sub folder is missing within the save path, create them when needed.
-                if (File.Exists(SavePath))//Check if the save file exist
+                if (File.Exists(ItemManager.GetFullSavePath(SavePath)))//Check if the save file exist
                 {
-                    string _data = File.ReadAllText(SavePath, System.Text.Encoding.UTF8);
+                    string _data = File.ReadAllText(ItemManager.GetFullSavePath(SavePath), System.Text.Encoding.UTF8);
                     Load(_data);
                 }
             }
@@ -309,7 +316,7 @@ namespace SoftKitty.InventoryEngine
 
         IEnumerator SaveCoroutine()
         {
-            yield return new WaitForSeconds(1F);//Wait for one second to prevent unnecessary multiple save actions within a few frames.
+            yield return new WaitForSecondsRealtime(1F);//Wait for one second to prevent unnecessary multiple save actions within a few frames.
             Save();
         }
 
@@ -332,7 +339,7 @@ namespace SoftKitty.InventoryEngine
                 while (mCraftingProgress < 1F)
                 {
                     yield return 1;
-                    mCraftingProgress = Mathf.MoveTowards(mCraftingProgress, 1F, Time.deltaTime * (1F / _craftingTime));
+                    mCraftingProgress = Mathf.MoveTowards(mCraftingProgress, 1F, Time.unscaledDeltaTime * (1F / _craftingTime));
                 }
                 
                 bool _goodToGo = true;
@@ -346,9 +353,18 @@ namespace SoftKitty.InventoryEngine
                     {
                         RemoveItem(Mathf.FloorToInt(_materials[i].x), Mathf.FloorToInt(_materials[i].y));
                     }
-                    AddItem(new Item(_itemId,true,true), 1);
-                    mCraftedItemNumber++;
-                    mCraftingFailed = false;
+                    InventoryStack _leftStack = AddItem(new Item(_itemId,true,true), 1);
+                    if (_leftStack.isEmpty())
+                    {
+                        mCraftedItemNumber++;
+                        mCraftingFailed = false;
+                    }
+                    else
+                    {
+                        DynamicMsg.PopMsg(ItemManager.instance.msgBagFull);
+                        mCraftingFailed = true;
+                        u = _number;
+                    }
                 }
                 else
                 {
@@ -359,7 +375,7 @@ namespace SoftKitty.InventoryEngine
                 }
                 yield return 1;
             }
-            if(Type== HolderType.PlayerInventory) DynamicMsg.PopItem(ItemManager.itemDic[_itemId], _number);
+            if(Type== HolderType.PlayerInventory && mCraftedItemNumber>0) DynamicMsg.PopItem(ItemManager.itemDic[_itemId], mCraftedItemNumber);
             yield return 1;
             mCrafting = false;
         }
@@ -458,6 +474,11 @@ namespace SoftKitty.InventoryEngine
         /// <returns></returns>
         public UiWindow OpenWindow()
         {
+            if (this == null)
+            {
+                Debug.LogError("The InventoryHolder you are trying to access is missing.");
+                return null;
+            }
             UiWindow _newWindow = null;
             switch (Type)
             {
@@ -576,45 +597,88 @@ namespace SoftKitty.InventoryEngine
         }
 
         /// <summary>
-        /// Override the base stats value by the attribute ScriptKey.
+        /// Add value to the base stats value by the attribute ScriptKey. Return the final result. Becareful to not frequently call this function with '_save' set to true.
+        /// </summary>
+        /// <param name="_key"></param>
+        /// <param name="_addValue"></param>
+        /// <returns></returns>
+        public float AddBaseStatsValue(string _key,float _addValue,bool _save=true)
+        {
+            foreach (var obj in BaseStats)
+            {
+                if (obj.key == _key)
+                {
+                    obj.UpdateValue(obj.GetFloat()+ _addValue);
+                    if(_save) CheckAutoSave();
+                    return obj.GetFloat();
+                }
+            }
+            return 0F;
+        }
+
+        /// <summary>
+        /// Add value to the base stats value by the attribute ScriptKey.Return the final result. Becareful to not frequently call this function with '_save' set to true.
+        /// </summary>
+        /// <param name="_key"></param>
+        /// <param name="_addValue"></param>
+        /// <returns></returns>
+        public int AddBaseStatsValue(string _key, int _addValue, bool _save = true)
+        {
+            foreach (var obj in BaseStats)
+            {
+                if (obj.key == _key)
+                {
+                    obj.UpdateValue(obj.GetInt() + _addValue);
+                    if (_save) CheckAutoSave();
+                    return obj.GetInt();
+                }
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Override the base stats value by the attribute ScriptKey.Becareful to not frequently call this function with '_save' set to true.
         /// </summary>
         /// <param name="_key"></param>
         /// <param name="_value"></param>
-        public void SetBaseStatsValue(string _key,string _value)
+        public void SetBaseStatsValue(string _key,string _value, bool _save = true)
         {
             foreach (var obj in BaseStats)
             {
                 if (obj.key == _key) obj.UpdateValue(_value);
             }
+            if (_save) CheckAutoSave();
         }
         /// <summary>
-        /// Set the base stats value by the attribute ScriptKey.
+        /// Set the base stats value by the attribute ScriptKey. Becareful to not frequently call this function with '_save' set to true.
         /// </summary>
         /// <param name="_key"></param>
         /// <param name="_value"></param>
-        public void SetBaseStatsValue(string _key, int _value)
+        public void SetBaseStatsValue(string _key, int _value, bool _save = true)
         {
             foreach (var obj in BaseStats)
             {
                 if (obj.key == _key) obj.UpdateValue(_value);
             }
+            if (_save) CheckAutoSave();
         }
         /// <summary>
-        /// Set the base stats value by the attribute ScriptKey.
+        /// Set the base stats value by the attribute ScriptKey. Becareful to not frequently call this function with '_save' set to true.
         /// </summary>
         /// <param name="_key"></param>
         /// <param name="_value"></param>
-        public void SetBaseStatsValue(string _key, float _value)
+        public void SetBaseStatsValue(string _key, float _value, bool _save = true)
         {
             foreach (var obj in BaseStats)
             {
                 if (obj.key == _key) obj.UpdateValue(_value);
             }
+            if (_save) CheckAutoSave();
         }
 
 
         /// <summary>
-        /// Retrieves the total value of an attribute by its ScriptKey from all equipped items and the base stats.
+        /// Retrieves the total value of an attribute by its ScriptKey from all equipped items and the base stats. 
         /// </summary>
         /// <param name="_attributeKey"></param>
         /// <returns></returns>
@@ -638,7 +702,8 @@ namespace SoftKitty.InventoryEngine
             return _value;
         }
 
-    
+
+
         /// <summary>
         /// Retrieves the total value of an attribute by its ScriptKey, counting only equipment with matching tags.
         /// </summary>
@@ -807,7 +872,7 @@ namespace SoftKitty.InventoryEngine
         /// </summary>
         public void Save()
         {
-            if(SavePath.Length>0) File.WriteAllText(SavePath, GetSaveDataJsonString(), System.Text.Encoding.UTF8);
+            if(SavePath.Length>0) File.WriteAllText(ItemManager.GetFullSavePath(SavePath), GetSaveDataJsonString(), System.Text.Encoding.UTF8);
         }
 
         /// <summary>
@@ -885,6 +950,20 @@ namespace SoftKitty.InventoryEngine
             _saveRoot.items = _saveItems;
             _saveRoot.hiddenItems = _hiddenItems;
             _saveRoot.currency = _currency;
+            if (BaseStats.Count>0 && (Type == HolderType.PlayerEquipment || Type == HolderType.NpcEquipment))
+            {
+                _saveRoot.baseAttributeKey = new string[BaseStats.Count];
+                _saveRoot.baseAttributeValue = new string[BaseStats.Count];
+                for (int i=0;i< BaseStats.Count;i++) {
+                    _saveRoot.baseAttributeKey[i] = BaseStats[i].key;
+                    _saveRoot.baseAttributeValue[i] = BaseStats[i].value;
+                }
+            }
+            else
+            {
+                _saveRoot.baseAttributeKey = new string[0];
+                _saveRoot.baseAttributeValue = new string[0];
+            }
             return JsonUtility.ToJson(_saveRoot);
         }
 
@@ -893,7 +972,7 @@ namespace SoftKitty.InventoryEngine
         /// </summary>
         public void Load()
         {
-            LoadByPath(SavePath);
+            LoadByPath(ItemManager.GetFullSavePath(SavePath));
         }
 
 
@@ -929,6 +1008,29 @@ namespace SoftKitty.InventoryEngine
             }
             Currency.Reset();
             Currency.Init(_saveRoot.currency);
+
+            if ((Type== HolderType.PlayerEquipment || Type== HolderType.NpcEquipment) 
+                &&_saveRoot.baseAttributeKey!=null && _saveRoot.baseAttributeValue!=null 
+                && _saveRoot.baseAttributeKey.Length>0 && _saveRoot.baseAttributeValue.Length > 0 && _saveRoot.baseAttributeValue.Length== _saveRoot.baseAttributeKey.Length) {
+                Dictionary<string, string> _keyValue = new Dictionary<string, string>();
+                for (int i = 0; i < _saveRoot.baseAttributeKey.Length; i++)
+                {
+                    if (!_keyValue.ContainsKey(_saveRoot.baseAttributeKey[i])) _keyValue.Add(_saveRoot.baseAttributeKey[i], _saveRoot.baseAttributeValue[i]);
+                }
+                for (int i = 0; i < BaseStats.Count; i++) {
+                    if (_keyValue.ContainsKey(BaseStats[i].key)) {
+                        BaseStats[i].value = _keyValue[BaseStats[i].key];
+                        _keyValue.Remove(BaseStats[i].key);
+                    }
+                }
+                foreach (var key in _keyValue.Keys) {
+                    if (ItemManager.instance.GetAtttibute(key) != null) {
+                        Attribute _newAtt = ItemManager.instance.GetAtttibute(key).Copy();
+                        _newAtt.value = _keyValue[key];
+                        BaseStats.Add(_newAtt);
+                    }
+                }
+            }
         }
 
 
@@ -1205,7 +1307,7 @@ namespace SoftKitty.InventoryEngine
                 {
                     if (Stacks[i].isSameItem(_item.uid,_item.upgradeLevel,_item.enchantments,_item.socketedItems))
                     {
-                        _newStack = Stacks[i].Merge(_newStack);
+                       if(Stacks[i].Number< Stacks[i].Item.maxiumStack) _newStack = Stacks[i].Merge(_newStack);
                     }
                 }
                 else
@@ -1453,7 +1555,7 @@ namespace SoftKitty.InventoryEngine
                 {
                     if (!ItemManager.itemDic[_uid].AbleToUse(GetInventoryHolderByType(gameObject, HolderType.PlayerEquipment)))
                     {
-                        if (ItemManager.instance.GetAtttibute(ItemManager.itemDic[_uid].restrictionKey)!=null) DynamicMsg.PopMsg("You can not use this item because of your " + ItemManager.instance.GetAtttibute(ItemManager.itemDic[_uid].restrictionKey).name + " is less than " + ItemManager.itemDic[_uid].restrictionValue + ".");
+                        if (ItemManager.instance.GetAtttibute(ItemManager.itemDic[_uid].restrictionKey)!=null) DynamicMsg.PopMsg(ItemManager.instance.msgItemUseRestricted.Replace("{name}", ItemManager.instance.GetAtttibute(ItemManager.itemDic[_uid].restrictionKey).name).Replace("{value}", ItemManager.itemDic[_uid].restrictionValue.ToString()));
                         return;
                     }
                 }
@@ -1461,7 +1563,7 @@ namespace SoftKitty.InventoryEngine
                 {
                     if (!ItemManager.itemDic[_uid].AbleToUse(GetInventoryHolderByType(gameObject, HolderType.NpcEquipment)))
                     {
-                        if (ItemManager.instance.GetAtttibute(ItemManager.itemDic[_uid].restrictionKey) != null) DynamicMsg.PopMsg("Can not use this item because of the " + ItemManager.instance.GetAtttibute(ItemManager.itemDic[_uid].restrictionKey).name + " is less than " + ItemManager.itemDic[_uid].restrictionValue + ".");
+                        if (ItemManager.instance.GetAtttibute(ItemManager.itemDic[_uid].restrictionKey) != null) DynamicMsg.PopMsg(ItemManager.instance.msgItemUseRestricted.Replace("{name}", ItemManager.instance.GetAtttibute(ItemManager.itemDic[_uid].restrictionKey).name).Replace("{value}", ItemManager.itemDic[_uid].restrictionValue.ToString()));
                         return;
                     }
                 }

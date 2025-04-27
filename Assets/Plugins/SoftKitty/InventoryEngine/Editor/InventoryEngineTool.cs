@@ -12,8 +12,8 @@ namespace SoftKitty.InventoryEngine
         private List<GameObject> _textComponents = new List<GameObject>();
         private UiStyle _styleScript;
         private bool _fold = false;
-        private TMPro.TMP_FontAsset _font;
-        Vector2 _scroll;
+        private TMPro.TMP_FontAsset _font; // If you're not using TMP, and encounter console error point to this line, please remove this whole script.
+        private Vector2 _scroll;
 
         void OnGUI()
         {
@@ -23,6 +23,7 @@ namespace SoftKitty.InventoryEngine
             header.alignment = TextAnchor.MiddleCenter;
 
             GUILayout.BeginVertical();
+
 
             GUILayout.BeginHorizontal();
             GUI.color = Color.green;

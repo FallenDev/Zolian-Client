@@ -110,12 +110,12 @@ namespace SoftKitty
         {
             if (!inited) return;
 
-            if (_usePosition) _targetGraphic.anchoredPosition = Vector2.Lerp(_targetGraphic.anchoredPosition, isHover ? _hoverPosition : _oriPos, Time.deltaTime * 10F);
-            if (_useAngle) _targetGraphic.localEulerAngles = new Vector3(0F, 0F, Mathf.Lerp(_targetGraphic.localEulerAngles.z, isHover ? _hoverAngle : _oriAngle, Time.deltaTime * 10F));
-            if (_useScale) _targetGraphic.localScale = Vector3.Lerp(_targetGraphic.localScale, isHover ? _hoverScale : _oriScale, Time.deltaTime * 10F);
+            if (_usePosition) _targetGraphic.anchoredPosition = Vector2.Lerp(_targetGraphic.anchoredPosition, isHover ? _hoverPosition : _oriPos, Time.unscaledDeltaTime * 10F);
+            if (_useAngle) _targetGraphic.localEulerAngles = new Vector3(0F, 0F, Mathf.Lerp(_targetGraphic.localEulerAngles.z, isHover ? _hoverAngle : _oriAngle, Time.unscaledDeltaTime * 10F));
+            if (_useScale) _targetGraphic.localScale = Vector3.Lerp(_targetGraphic.localScale, isHover ? _hoverScale : _oriScale, Time.unscaledDeltaTime * 10F);
             if (_useColor)
             {
-                SetColor(_targetGraphic, Color.Lerp(GetColor(_targetGraphic), isHover ? _hoverColor : _oriColor, Time.deltaTime * 10F));
+                SetColor(_targetGraphic, Color.Lerp(GetColor(_targetGraphic), isHover ? _hoverColor : _oriColor, Time.unscaledDeltaTime * 10F));
             }
 
         }

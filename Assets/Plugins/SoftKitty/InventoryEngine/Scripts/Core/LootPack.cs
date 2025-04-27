@@ -16,6 +16,8 @@ namespace SoftKitty.InventoryEngine
         public float DropChanceMultiplier = 1F;
         public bool RandomLevel = false;
         public bool DestoryWhenPlayerCloseLootWindow = true;
+        public bool RandomEnchantment = false;
+        public int MaxiumEnhancingLevel=10;
         private LootUi lootWindow;
         private InventoryHolder holder;
         private bool inited = false;
@@ -23,7 +25,7 @@ namespace SoftKitty.InventoryEngine
         #endregion
 
         #region Internal Methods
-        public static void GetRandomLoot(InventoryHolder _holder, List<int> _itemIdPool, int[] _currencyMinArray, int[] _currencyMaxArray, int _maxiumItemCount = 5, float _dropChanceMultiplier = 1F, bool _randomLevel=false, int _maxiumCountEachItem = 3)
+        public static void GetRandomLoot(InventoryHolder _holder, List<int> _itemIdPool, int[] _currencyMinArray, int[] _currencyMaxArray, int _maxiumItemCount = 5, float _dropChanceMultiplier = 1F, bool _randomLevel=false, int _maxiumCountEachItem = 3, int _maxiumEnhancingLevel=1, bool _randomEnchantments=false)
         {
             List<Item> _dropList = new List<Item>();
             Random.InitState(System.DateTime.Now.Millisecond + System.DateTime.Now.Hour * 10000 + System.DateTime.Now.Minute * 1000);
@@ -31,10 +33,10 @@ namespace SoftKitty.InventoryEngine
             {
                 if (Random.Range(0, 100) < ItemManager.itemDic[obj].dropRates * _dropChanceMultiplier)
                 {
-                    Item _newItem = new Item(obj,true, true);
+                    Item _newItem = new Item(obj, _randomEnchantments, true);
                     if (_randomLevel && ItemManager.instance.EnableEnhancing && _newItem.type == ItemManager.instance.EnhancingCategoryID)
                     {
-                        int _level = Random.Range(0, ItemManager.instance.MaxiumEnhancingLevel);
+                        int _level = Random.Range(0, Mathf.Clamp(_maxiumEnhancingLevel, 1, ItemManager.instance.MaxiumEnhancingLevel));
                         if (Random.Range(0, 100) < ItemManager.instance.EnhancingSuccessCurve.Evaluate(_level*1F/ ItemManager.instance.MaxiumEnhancingLevel)) {
                             _newItem.upgradeLevel = _level;
                         }
@@ -45,10 +47,10 @@ namespace SoftKitty.InventoryEngine
 
             if (_dropList.Count <= 0)
             {
-                Item _newItem = new Item(_itemIdPool[Random.Range(0, _itemIdPool.Count)], true, true);
+                Item _newItem = new Item(_itemIdPool[Random.Range(0, _itemIdPool.Count)], _randomEnchantments, true);
                 if (_randomLevel && ItemManager.instance.EnableEnhancing && _newItem.type == ItemManager.instance.EnhancingCategoryID)
                 {
-                    int _level = Random.Range(0, ItemManager.instance.MaxiumEnhancingLevel);
+                    int _level = Random.Range(0, Mathf.Clamp(_maxiumEnhancingLevel, 1, ItemManager.instance.MaxiumEnhancingLevel));
                     if (Random.Range(0, 100) < ItemManager.instance.EnhancingSuccessCurve.Evaluate(_level * 1F / ItemManager.instance.MaxiumEnhancingLevel))
                     {
                         _newItem.upgradeLevel = _level;
@@ -103,7 +105,7 @@ namespace SoftKitty.InventoryEngine
         {
             holder = gameObject.AddComponent<InventoryHolder>();
             holder.name = UID;
-            GetRandomLoot(holder, ItemPool, CurrencyMin.ToArray(), CurrencyMax.ToArray(), MaxiumItemCount, DropChanceMultiplier,RandomLevel,  MaxiumCountEachItem);
+            GetRandomLoot(holder, ItemPool, CurrencyMin.ToArray(), CurrencyMax.ToArray(), MaxiumItemCount, DropChanceMultiplier,RandomLevel,  MaxiumCountEachItem,MaxiumEnhancingLevel,RandomEnchantment);
             inited = true;
         }
         #endregion

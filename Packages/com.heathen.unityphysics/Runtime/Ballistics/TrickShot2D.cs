@@ -1,5 +1,6 @@
 ﻿#if HE_SYSCORE
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace HeathenEngineering.UnityPhysics
@@ -23,8 +24,10 @@ namespace HeathenEngineering.UnityPhysics
         private void Start()
         {
             selfTransform = transform;
+            resolution = math.max(resolution, 0.0001f);
         }
 
+        [ContextMenu("Shoot")]
         public void Shoot()
         {
             var GO = Instantiate(template.gameObject);

@@ -18,7 +18,7 @@ namespace SoftKitty.InventoryEngine
         public override void Update()
         {
             base.Update();
-            checkTime = Mathf.MoveTowards(checkTime, 1F, Time.deltaTime * 2F);
+            checkTime = Mathf.MoveTowards(checkTime, 1F, Time.unscaledDeltaTime * 2F);
             if (checkTime >= 1F)
             {
                 checkTime = 0F;
@@ -68,11 +68,18 @@ namespace SoftKitty.InventoryEngine
         {
             if (!Items[_index].isEmpty() && Items[_index].GetItem()!=null)
             {
-                DynamicMsg.PopItem(Items[_index].GetItem(), Items[_index].GetNumber());
                 InventoryStack _leftStack = ItemManager.PlayerInventoryHolder.AddItem(Items[_index].GetItem(), Items[_index].GetNumber());
+                if (!_leftStack.isEmpty())
+                {
+                    if(_leftStack.Number< Items[_index].GetNumber()) DynamicMsg.PopItem(Items[_index].GetItem(), Items[_index].GetNumber()- _leftStack.Number);
+                    DynamicMsg.PopMsg(ItemManager.instance.msgBagFull);
+                }
+                else
+                {
+                    DynamicMsg.PopItem(Items[_index].GetItem(), Items[_index].GetNumber());
+                }
                 Items[_index].Copy(_leftStack);
                 checkTime = 0F;
-                
             }
         }
 
