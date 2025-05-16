@@ -22,7 +22,7 @@ namespace Assets.Scripts.Managers
     {
         public long SteamId;
         // Character Login to World Server
-        public ushort WorldPort = 4202; // ToDo: Change to a UI box to pick a world server
+        public ushort WorldPort = 7777; // ToDo: Change to a UI box to pick a world server
         public Guid Serial;
         public string UserName;
         public Player LocalPlayer { get; private set; }
