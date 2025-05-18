@@ -1,8 +1,7 @@
 using Assets.Scripts.CharacterSelection;
 using Assets.Scripts.Entity.ScriptableObjects;
 using Assets.Scripts.Models;
-using Assets.Scripts.Network;
-
+using Assets.Scripts.NetworkAuth;
 using TMPro;
 
 using UnityEngine;

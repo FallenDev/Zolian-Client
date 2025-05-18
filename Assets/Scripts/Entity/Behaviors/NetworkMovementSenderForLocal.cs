@@ -34,7 +34,7 @@ namespace Assets.Scripts.Entity.Behaviors
 
         private void Update()
         {
-            if (_player == null || !_player.IsLocalPlayer || _player.Client == null) return;
+            if (_player == null || !_player.IsLocalPlayer) return;
             _timer += Time.deltaTime;
             if (_timer < _sendInterval) return;
 
@@ -44,14 +44,14 @@ namespace Assets.Scripts.Entity.Behaviors
 
             if (HasMovedSignificantly(position, direction, speed))
             {
-                _player.Client.SendMovement(
-                    _player.Serial,
-                    position,
-                    GetVelocity.y,
-                    direction,
-                    CameraYaw,
-                    speed
-                );
+                //_player.Client.SendMovement(
+                //    _player.Serial,
+                //    position,
+                //    GetVelocity.y,
+                //    direction,
+                //    CameraYaw,
+                //    speed
+                //);
 
                 _lastSentPosition = position;
                 _lastSentDirection = direction;

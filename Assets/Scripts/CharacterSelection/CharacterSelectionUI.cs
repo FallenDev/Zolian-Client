@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using Assets.Scripts.NetworkAuth;
+using Assets.Scripts.NetworkAuth.PacketArgs.ReceiveFromServer;
 using TMPro;
-using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
-using Assets.Scripts.Network;
 
 namespace Assets.Scripts.CharacterSelection
 {

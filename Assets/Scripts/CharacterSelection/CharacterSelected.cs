@@ -1,7 +1,7 @@
 using Assets.Scripts.Entity.ScriptableObjects;
 using Assets.Scripts.Managers;
 using Assets.Scripts.Models;
-using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
+using Assets.Scripts.NetworkAuth.PacketArgs.ReceiveFromServer;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;

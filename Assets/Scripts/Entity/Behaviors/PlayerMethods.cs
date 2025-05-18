@@ -1,6 +1,5 @@
 ﻿using Assets.Scripts.Entity.Entities;
-using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
-
+using Assets.Scripts.NetworkAuth.PacketArgs.ReceiveFromServer;
 using UnityEngine;
 
 namespace Assets.Scripts.Entity.Behaviors

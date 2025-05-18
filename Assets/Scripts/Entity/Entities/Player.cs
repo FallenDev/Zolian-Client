@@ -1,12 +1,10 @@
 ﻿using System;
 
-using Assets.Scripts.Entity.Abstractions;
 using Assets.Scripts.Entity.Behaviors;
 using Assets.Scripts.Entity.ScriptableObjects;
 using Assets.Scripts.Managers;
 using Assets.Scripts.Models;
-using Assets.Scripts.Network;
-using Assets.Scripts.Network.PacketArgs.ReceiveFromServer;
+using Assets.Scripts.NetworkAuth.PacketArgs.ReceiveFromServer;
 using JohnStairs.RCC;
 using JohnStairs.RCC.Character;
 using JohnStairs.RCC.Character.Cam;
@@ -18,10 +16,9 @@ using UnityEngine.InputSystem;
 
 namespace Assets.Scripts.Entity.Entities
 {
-    public class Player : Damageable, IPlayer, IPointerInfo, IClient
+    public class Player : Damageable, IPlayer, IPointerInfo
     {
         [Header("Base Properties")]
-        public WorldClient Client { get; set; }
         public RPGMotorMMO LocalMotor { get; set; }
         public RemoteRPGMotor RemoteMotor { get; set; }
 
@@ -88,11 +85,7 @@ namespace Assets.Scripts.Entity.Entities
             CharacterController = GetComponent<CharacterController>();
         }
 
-        public void Start()
-        {
-            if (IsLocalPlayer)
-                Client = WorldClient.Instance;
-        }
+        public void Start() { }
 
         private void Update()
         {
